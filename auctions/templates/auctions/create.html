@@ -10,24 +10,24 @@
 
     <form action="{% url 'create' %}" method="post">
         {% csrf_token %}
-        <div class="form-group">
-            <label for="inputTitle">Title</label>
+        <div class="mb-3">
+            <label for="inputTitle" class="form-label">Title</label>
             <input class="form-control" autofocus id="inputTitle" type="text" name="title">
         </div>
-        <div class="form-group">
-            <label for="textarea">Description</label>
+        <div class="mb-3">
+            <label for="textarea" class="form-label">Description</label>
             <textarea class="form-control" id="textarea" rows="3" name="description"></textarea>
         </div>        
-        <div class="form-group">
-            <label>Starting bid</label>
+        <div class="mb-3">
+            <label class="form-label">Starting bid</label>
             <input class="form-control" type="number" name="price">
         </div>
-        <div class="form-group">
-            <label>Image URL</label>
+        <div class="mb-3">
+            <label class="form-label">Image URL</label>
             <input class="form-control" type="url" name="image" placeholder="Image URL">
         </div>
-        <div class="form-group">
-            <label for="inputCategory">Category</label>
+        <div class="mb-3">
+            <label for="inputCategory" class="form-label">Category</label>
             <select id="inputCategory" class="form-control" name="category">
               <option selected>Choose...</option>
               {% for category in categories %}

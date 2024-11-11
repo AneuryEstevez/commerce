@@ -2,26 +2,27 @@
 
 {% block body %}
 
+    <h2 class="my-3">
     {% if category %}
-        <h2>{{ category }}</h2>
+        {{ category }}
     {% else %}
-        <h2>Active Listings</h2>
+        Active Listings
     {% endif %}
+    </h2>
 
     {% if listings %}
         {% for li in listings %}
-            <div class="card mb-3">
-                <div class="row no-gutters">
+            <div class="card mb-3" >
+                <div class="row g-0">
                 <div class="col-md-2">
-                    <img src="{{ li.imageURL }}" class="card-img" alt="{{ li.title }}">
+                    <img src="{{ li.imageURL }}" class="img-fluid rounded" alt="{{ li.title }}">
                 </div>
                 <div class="col-md-10">
                     <div class="card-body">
                     <h5 class="card-title">{{ li.title }}</h5>
-                    <p class="card-text"><b>Price:</b> ${{ li.price }}</p>
+                    <p class="card-text"><b>Price: </b> ${{ li.price }}</p>
                     <p class="card-text">{{ li.description }}</p>
                     <a href="{% url 'listings' li.id %}" class="stretched-link">View listing</a>
-                    <!-- <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
                     </div>
                 </div>
                 </div>
