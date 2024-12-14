@@ -2,13 +2,18 @@
 {% load static %}
 {% block body %}
 
-    <h2 class="my-3">
-    {% if category %}
-        {{ category }}
-    {% else %}
-        Active Listings
-    {% endif %}
-    </h2>
+
+    <div class="d-flex justify-content-between align-items-center my-3">
+        <h2>My Listings</h2>
+        {% comment %} <div> {% endcomment %}
+        <a href="{% url 'create' %}" class="btn btn-primary d-flex align-items-center">
+            Create &nbsp;
+            <span class="material-symbols-outlined">
+                add_circle
+            </span>
+        </a>
+        {% comment %} </div> {% endcomment %}
+    </div>
 
     {% if listings %}
         {% for li in listings %}
@@ -23,16 +28,27 @@
                 </div>
                 <div class="col-md-9">
                     <div class="card-body">
-                    <h5 class="card-title">{{ li.title }}</h5>
-                    <p class="card-text"><b>Price: </b> ${{ li.price }}</p>
-                    <p class="card-text">{{ li.description }}</p>
-                    <a href="{% url 'listings' li.id %}" class="stretched-link">View listing</a>
+                        
+                        <div class="d-flex justify-content-between ">
+                            <h5 class="card-title">{{ li.title }}</h5>
+                            <div>
+                                {% if li.isActive %}
+                                <span class="badge text-bg-success">Active</span>
+                                {% else %}
+                                <span class="badge text-bg-danger">Closed</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <p class="card-text"><b>Price: </b> ${{ li.price }}</p>
+                        <p class="card-text">{{ li.description }}</p>
+                        <a href="{% url 'listings' li.id %}" class="stretched-link">View listing</a>
                     </div>
                 </div>
                 </div>
             </div>
         {% endfor %}
-
+        
         <!-- Bootstrap Pagination -->
         <nav aria-label="Listings pagination">
             <ul class="pagination justify-content-center">
@@ -81,9 +97,10 @@
                 {% endif %}
             </ul>
         </nav>
-        
+    
     {% else %}
-        <h3>No listings found</h3>
+        <h3 class="text-center mt-5">No listings found</h3>
+        <p class="text-center"><a href="{% url "create" %}">Create your first listing</a></p>
     {% endif %}
 
 {% endblock %}

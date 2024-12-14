@@ -7,19 +7,26 @@ from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.forms import DecimalField
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Max
+from django.core.paginator import Paginator
 
 from .models import Bid, Listing, User, Category, Comment
+from .forms import *
 
 
 def index(request):
     listings = Listing.objects.filter(isActive=True)
+    paginator = Paginator(listings, 10)
+
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
     return render(request, "auctions/index.html", {
-        "listings": listings
+        "listings": page_obj
     })
 
 
@@ -50,61 +57,34 @@ def logout_view(request):
 
 def register(request):
     if request.method == "POST":
-        username = request.POST["username"]
-        email = request.POST["email"]
-
-        # Ensure password matches confirmation
-        password = request.POST["password"]
-        confirmation = request.POST["confirmation"]
-        if password != confirmation:
-            return render(request, "auctions/register.html", {
-                "message": "Passwords must match."
-            })
-
-        # Attempt to create new user
-        try:
-            user = User.objects.create_user(username, email, password)
-            user.save()
-        except IntegrityError:
-            return render(request, "auctions/register.html", {
-                "message": "Username already taken."
-            })
-        login(request, user)
-        return HttpResponseRedirect(reverse("index"))
+        form = CreateUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            user = authenticate(request, username=form.cleaned_data["username"], password=form.cleaned_data["password1"])
+            login(request, user)
+            return HttpResponseRedirect(reverse("index"))
     else:
-        return render(request, "auctions/register.html")
+        form = CreateUserForm()
+
+    return render(request, "auctions/register.html", {"form": form})
 
 @login_required
 def createListing(request):
     if request.method == "POST":
-        # Get values from form
         user = request.user
-        title = request.POST["title"]
-        description = request.POST["description"]
-        price = request.POST["price"]
-        image = request.POST["image"]
-        if request.POST["category"] == "Choose...":
-            category = None
-        else:
-            category = Category.objects.get(name=request.POST["category"])
-        
-        # Create and save listing
-        listing = Listing(
-            user = user,
-            title = title,
-            description = description,
-            price = price, 
-            imageURL = image,
-            category = category
-        )
-        listing.save()
-
-        # Redirect to index
-        return HttpResponseRedirect(reverse("index"))
+        form = ListingForm(request.POST, request.FILES)
+        if form.is_valid():
+            listing = form.save(commit=False)
+            listing.user = user
+            listing.save()
+            return HttpResponseRedirect(reverse("index"))
     else:
-        return render(request, "auctions/create.html", {
-            "categories": Category.objects.all()
-        })
+        form = ListingForm()
+        
+    return render(request, "auctions/create.html", {
+        "categories": Category.objects.all(),
+        "form": form
+    })
 
 def categories(request):
     return render(request, "auctions/categories.html", {
@@ -119,13 +99,18 @@ def categoryListings(request, category):
         return render(request, "auctions/index.html") 
     
     listings = Listing.objects.filter(isActive=True, category=category)
+    paginator = Paginator(listings, 10)
+
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    
     return render(request, "auctions/index.html", {
         "category": category,
-        "listings": listings
+        "listings": page_obj
     })
 
 def listingDetails(request, id):
-    listing = Listing.objects.get(id=id)
+    listing = get_object_or_404(Listing, id=id)
     user = request.user
     owner = False
     if user == listing.user:
@@ -192,8 +177,13 @@ def watchListing(request, id):
 def watchlist(request):
     user = request.user
     listings = user.watchlist.all()
+    paginator = Paginator(listings, 10)
+
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    
     return render(request, "auctions/index.html", {
-        "listings": listings
+        "listings": page_obj
     })
 
 
@@ -233,3 +223,14 @@ def closeAuction(request, id):
             "submitted": True
         })
 
+@login_required
+def myListings(request):
+    user = request.user
+    listings = user.listings.all()
+    paginator = Paginator(listings, 10)
+
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    return render(request, "auctions/listings.html", {
+        "listings": page_obj
+    })

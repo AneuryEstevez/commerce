@@ -1,4 +1,5 @@
 {% extends "auctions/layout.html" %}
+{% load crispy_forms_tags%}
 
 {% block body %}
 <div class="row justify-content-center py-5">
@@ -15,58 +16,61 @@
 
                 <form action="{% url 'register' %}" method="post">
                     {% csrf_token %}
+
                     <div class="mb-3">
                         <div class="input-group">
                             <span class="input-group-text">
-                                <i class="bi bi-person-fill"></i>
+                                <span class="material-symbols-outlined">person</span>
                             </span>
-                            <input autofocus type="text" 
-                                    class="form-control form-control-lg" 
-                                    name="username" 
-                                    placeholder="Username"
-                                    required>
+                            {{ form.username }}
                         </div>
+                        {% if form.username.errors %}
+                            <div class="text-danger">
+                                {{ form.username.errors }}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="mb-3">
                         <div class="input-group">
                             <span class="input-group-text">
-                                <i class="bi bi-envelope-fill"></i>
+                                <span class="material-symbols-outlined">mail</span>
                             </span>
-                            <input type="email" 
-                                    class="form-control form-control-lg" 
-                                    name="email" 
-                                    placeholder="Email Address"
-                                    required>
+                            {{ form.email}}
                         </div>
+                        {% if form.email.errors %}
+                            <div class="text-danger">
+                                {{ form.email.errors }}
+                            </div>
+                        {% endif %}
                     </div>
                     
                     <div class="mb-3">
                         <div class="input-group">
                             <span class="input-group-text">
-                                <i class="bi bi-lock-fill"></i>
+                                <span class="material-symbols-outlined">key</span>
                             </span>
-                            <input type="password" 
-                                    class="form-control form-control-lg" 
-                                    name="password" 
-                                    placeholder="Password"
-                                    autocomplete="new-password"
-                                    required>
+                            {{ form.password1 }}
                         </div>
+                        {% if form.password1.errors %}
+                            <div class="text-danger">
+                                {{ form.password1.errors }}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="mb-4">
                         <div class="input-group">
                             <span class="input-group-text">
-                                <i class="bi bi-key-fill"></i>
+                                <span class="material-symbols-outlined">lock</span>
                             </span>
-                            <input type="password" 
-                                    class="form-control form-control-lg" 
-                                    name="confirmation" 
-                                    placeholder="Confirm Password"
-                                    autocomplete="new-password"
-                                    required>
+                            {{ form.password2 }}
                         </div>
+                        {% if form.password2.errors %}
+                            <div class="text-danger">
+                                {{ form.password2.errors }}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="d-grid">

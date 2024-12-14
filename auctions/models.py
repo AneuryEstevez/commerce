@@ -3,6 +3,7 @@ from tkinter import CASCADE
 from unicodedata import category
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.core.validators import MinValueValidator
 
 
 class User(AbstractUser):
@@ -18,9 +19,10 @@ class Listing(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="listings")
     isActive = models.BooleanField(default=True)
     title = models.CharField(max_length=64)
-    description = models.CharField(max_length=200, blank=True)
-    price = models.DecimalField(max_digits=9, decimal_places=2)
-    imageURL = models.URLField(null=True, blank=True)
+    description = models.TextField(max_length=200, blank=True)
+    price = models.DecimalField(max_digits=9, decimal_places=2, validators=[MinValueValidator(0.01)])
+    #imageURL = models.URLField(null=True, blank=True)
+    image = models.ImageField(upload_to='images/', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="listings", null=True, blank=True)
     watchlistUsers = models.ManyToManyField(User, blank=True, null=True, related_name="watchlist")
     
